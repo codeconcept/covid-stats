@@ -1,5 +1,5 @@
 const title = document.querySelector(".title");
-const countries = document.getElementById("countries");
+const countriesSelect = document.getElementById("countries");
 const BASE_URL = "https://covid19.mathdro.id/api";
 let countriesOptions = [];
 let error = null;
@@ -12,7 +12,6 @@ function getCountries() {
     fetch(`${BASE_URL}/countries`)
       .then(data => data.json())
       .then(countries => {
-        console.log("countries", countries);
         resolve(countries);
       })
       .catch(err => {
@@ -23,7 +22,11 @@ function getCountries() {
 }
 
 getCountries().then(data => {
-  console.log("works", data.countries);
+  let option;
+  Object.entries(data.countries).forEach(country => {
+    option = document.createElement("option");
+    option.text = country[0];
+    option.value = country[1];
+    countriesSelect.add(option);
+  });
 });
-
-// countries.innerHTML = countriesOptions;
