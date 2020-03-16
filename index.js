@@ -13,9 +13,7 @@ countriesSelect.addEventListener("change", e => {
   console.log(countryCode);
   getStatistics(countryCode)
     .then(stats => {
-      errorDiv.innerText = "";
-      const countryStats = `Cas confirmés ${stats.confirmed.value} - Guéris : ${stats.recovered.value} - Décédés : ${stats.deaths.value}`;
-      countryStatsDiv.innerHTML = countryStats;
+      displayStatistics(stats);
     })
     .catch(err => {
       countryStatsDiv.innerHTML = "";
@@ -47,9 +45,66 @@ getCountries().then(data => {
   });
 });
 
+getStatistics("monde").then(stats => {
+  displayStatistics(stats);
+});
+
+function displayStatistics(stats) {
+  const lastUpdate = new Date(stats.lastUpdate);
+  const niceDate = getLastDataUpdateDate(lastUpdate);
+  errorDiv.innerText = "";
+  const countryStats = `
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Confirmés : ${stats.confirmed.value}</h5>
+                </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Guéris : ${stats.recovered.value}</h5>
+                </div>
+                </div>
+            </div>
+             <div class="col-sm-4">
+                <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Décédés : ${stats.deaths.value}</h5>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 mt-4">Données mises à jour le ${niceDate}</div>
+        </div>
+    `;
+  countryStatsDiv.innerHTML = countryStats;
+}
+
+function getLastDataUpdateDate(lastUpdate) {
+  return `${makeToDigits(lastUpdate.getDate())}/${makeToDigits(
+    lastUpdate.getMonth() + 1
+  )}/${makeToDigits(lastUpdate.getFullYear())} à ${makeToDigits(
+    lastUpdate.getHours()
+  )}H${makeToDigits(lastUpdate.getMinutes())}min`;
+}
+
+function makeToDigits(value) {
+  return value > 9 ? value : "0" + value.toString();
+}
+
 function getStatistics(countryCode) {
+  let url;
+  if (countryCode === "monde") {
+    url = "https://covid19.mathdro.id/api";
+  } else {
+    url = `${BASE_URL}/countries/${countryCode}`;
+  }
   return new Promise((resolve, reject) => {
-    fetch(`${BASE_URL}/countries/${countryCode}`)
+    fetch(url)
       .then(data => data.json())
       .then(stats => {
         console.log("stats", stats);
