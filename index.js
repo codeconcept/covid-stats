@@ -39,8 +39,8 @@ getCountries().then(data => {
   let option;
   Object.entries(data.countries).forEach(country => {
     option = document.createElement("option");
-    option.text = country[0];
-    option.value = country[1];
+    option.text = country[1].name;
+    option.value = country[1].iso2;
     countriesSelect.add(option);
   });
 });
